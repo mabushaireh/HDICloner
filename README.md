@@ -9,7 +9,7 @@ This is a comamnd line tool that has the following options:
 6. Dry Run configuration (Validate cluster configuration)
 
 # High Level Architecture
-
+![Artifacts/HLA.png](/Artifacts/HLA.png)
 
 # Usage
 
