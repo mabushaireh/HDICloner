@@ -8,6 +8,9 @@ This is a comamnd line tool that has the following options:
 5. Sync Two clusters configuration 
 6. Dry Run configuration (Validate cluster configuration)
 
+# High Level Architecture
+
+
 # Usage
 
 # Setup
