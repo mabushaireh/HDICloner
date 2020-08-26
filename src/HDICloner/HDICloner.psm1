@@ -48,12 +48,40 @@ function Run-HDICloner {
     Write-Output "=== Script Started ==="
 
 
-    #Imoprt Script:
-    #Write-Debug "Debug" -Debug:($PSBoundParameters['Debug'] -eq $true)
-    #Write-Information ("Information ") -InformationAction SilentlyContinue
-    #Write-Warning "Warning"
-    #Write-Error "Error"
+    #TODO: Imoprt Script:
+    
 
+    #TODO: Create Folder structure
+    #   Default Path: <User profile Documents>\HDICloner\
+    #                                                       + <Sub ID ...1234>
+    #                                                       - <Sub ID ...5678>
+    #                                                                         +<Cluster DNS Name 1>
+    #                                                                         +<Cluster DNS Name 2>
+    #                                                                         -<Cluster DNS Name 3>
+    #                                                                                               -20082020_125322
+    #                                                                                                               -ARM
+    #                                                                                                                   HDI_CLUSTER-<CLUSTER DNS NAME>.json
+    #                                                                                                                   HDI_STORAGE_<CLUSTER DNS NAME>_<Storage Name>.json
+    #                                                                                                                   HDI_VNET_<CLUSTER DNS NAME>_<vnet name.json
+    #                                                                                                                   HDI_DB_AMBARI_<CLUSTER DNS NAME>_<DB NAME>.json
+    #                                                                                                                   HDI_DB_HIVE_<CLUSTER DNS NAME>_<DB NAME>.json
+    #                                                                                                                   HDI_ACTION_SCRIPTS_<CLUSTER DNS NAME>_<DB NAME>.json
+    #                                                                                                               -HDP                                                                                                
+    #                                                                                                                   +CONFIG
+    #                                                                                                                   +ENV
+    #                                                                                                               -Nodes
+    #                                                                                                                   +HN
+    #                                                                                                                   +WN
+    #                                                                                                                   +ZK
+    #                                                                                               +20082020_143254
+    #                                                                                               +22102020_212237
+    #                                                                         +<Cluster DNS Name 4>
+    #                                                       + <Sub ID ...9012>
+    
+
+
+
+    
     switch -Exact ($Operation) {
         'Get' {
             Get-HDIClonerClusterConfig -SourceCluster $SourceCluster
