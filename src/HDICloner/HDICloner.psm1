@@ -35,14 +35,16 @@ function Run-HDICloner {
 
     Show-Info "=== Script Preperation Started ==="
 
-    $ScriptVersion = '0.0.0.8'
+    $ScriptVersion = '0.0.0.9'
     Show-Debug "ScriptVersion : $ScriptVersion"
 
     $ConfirmPreference = "High"
 
 
     $timestamp = Get-TimeStampUtcNWS
-    $transcriptPath = "$env:TEMP\$timestamp\"
+    Show-Debug "timestamp is set to $timestamp"
+
+    $transcriptPath = "$env:TEMP\$timestamp"
     
 
 
@@ -51,7 +53,7 @@ function Run-HDICloner {
     $documentsPath = [Environment]::GetFolderPath("MyDocuments")
     $outputFolder = "HDICloner"
 
-    Show-Debug "documentsPath is $documentsPath"
+    Show-Debug "documentsPath is set to $documentsPath"
     Create-FolderIfNotExist $outputFolder $documentsPath
 
     $outputPath = "$documentsPath\$outputFolder"
@@ -63,51 +65,35 @@ function Run-HDICloner {
     Show-Info "=== Script is Ready ==="
 
     $null = Start-Transcript -Path "$transcriptPath\Transcript.txt"
-    Show-Debug ("Transacript Started and transcript file is $transcriptPath\Transcript.txt")
+    Show-Debug "Transacript Started and transcript file is $transcriptPath\Transcript.txt"
 
 
     Show-Debug "Passed value for Operation is $Operation"
     Show-Debug "Passed value for SourceCluster is $SourceCluster"
     Show-Debug "Passed value for SourceSubId is $SourceSubId"
+    Show-Info "Set Azure Context to the Source Cluster Subscription"
+    $context = Get-AzureUtilsAccount $SourceSubId
+    $SourceSubId = $context.Subscription.Id
 
+    #TODO: Move this to the Get-HDIClonerClusterConfig.ps1
     Create-FolderIfNotExist $SourceSubId $outputPath
     Create-FolderIfNotExist $SourceCluster "$outputPath\$SourceSubId"
     Create-FolderIfNotExist $timestamp "$outputPath\$SourceSubId\$SourceCluster"
+    Create-FolderIfNotExist $timestamp "$outputPath\$SourceSubId\$SourceCluster"
+    Create-FolderIfNotExist "ARM" "$outputPath\$SourceSubId\$SourceCluster\$timestamp"
+    Create-FolderIfNotExist "HDP" "$outputPath\$SourceSubId\$SourceCluster\$timestamp"
+    Create-FolderIfNotExist "CONFIG" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\HDP"
+    Create-FolderIfNotExist "ENV" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\HDP"
+    Create-FolderIfNotExist "Nodes" "$outputPath\$SourceSubId\$SourceCluster\$timestamp"
+    Create-FolderIfNotExist "HN" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\Nodes"
+    Create-FolderIfNotExist "WN" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\Nodes"
+    Create-FolderIfNotExist "ZK" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\Nodes"
 
 
 
     Show-Info "=== Run $Operation HDICloner Operation Started ==="
 
-
-    #TODO: Imoprt Script:
     
-
-    #TODO: Create Folder structure
-    #   Default Path: <User profile Documents>\HDICloner\
-    #                                                       + <Sub ID ...1234>
-    #                                                       - <Sub ID ...5678>
-    #                                                                         +<Cluster DNS Name 1>
-    #                                                                         +<Cluster DNS Name 2>
-    #                                                                         -<Cluster DNS Name 3>
-    #                                                                                               -20082020_125322
-    #                                                                                                               -ARM
-    #                                                                                                                   HDI_CLUSTER-<CLUSTER DNS NAME>.json
-    #                                                                                                                   HDI_STORAGE_<CLUSTER DNS NAME>_<Storage Name>.json
-    #                                                                                                                   HDI_VNET_<CLUSTER DNS NAME>_<vnet name.json
-    #                                                                                                                   HDI_DB_AMBARI_<CLUSTER DNS NAME>_<DB NAME>.json
-    #                                                                                                                   HDI_DB_HIVE_<CLUSTER DNS NAME>_<DB NAME>.json
-    #                                                                                                                   HDI_ACTION_SCRIPTS_<CLUSTER DNS NAME>_<DB NAME>.json
-    #                                                                                                               -HDP                                                                                                
-    #                                                                                                                   +CONFIG
-    #                                                                                                                   +ENV
-    #                                                                                                               -Nodes
-    #                                                                                                                   +HN
-    #                                                                                                                   +WN
-    #                                                                                                                   +ZK
-    #                                                                                               +20082020_143254
-    #                                                                                               +22102020_212237
-    #                                                                         +<Cluster DNS Name 4>
-    #                                                       + <Sub ID ...9012>
     
 
     
@@ -130,8 +116,10 @@ function Run-HDICloner {
     }
 
     Show-Info "=== Run $Operation HDICloner Operation Completed ==="
+    
 
     $null = Stop-Transcript
+    Show-Debug "Transacript Stopped and transcript file is $transcriptPath\Transcript.txt"
 
 }
 

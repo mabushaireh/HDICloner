@@ -23,18 +23,34 @@ Function Get-Stack {
     return $stack
 }
  
+function Show-Prompt ($msg)
+{
+    $timeStamp = Get-TimeStampUtc
+    $stack = Get-Stack
+    $errorMsg = "$timeStamp : INFO - $stack -  $Msg"    
+    # save the current color
+    $fc = $host.UI.RawUI.ForegroundColor
 
+     # set the new color
+     $host.UI.RawUI.ForegroundColor = "Green"
+
+     Write-Host $errorMsg
+     
+     # restore the original color
+     $host.UI.RawUI.ForegroundColor = $fc
+}
 function Show-Error($Msg)
 {
     $timeStamp = Get-TimeStampUtc
-    $errorMsg = "$timeStamp : ERROR  - $Msg"
+    $stack = Get-Stack
+    $errorMsg = "$timeStamp : ERROR - $stack -  $Msg"    
     # save the current color
     $fc = $host.UI.RawUI.ForegroundColor
 
     # set the new color
     $host.UI.RawUI.ForegroundColor = "Red"
 
-    Write-Output $errorMsg
+    Write-Host $errorMsg
     
     # restore the original color
     $host.UI.RawUI.ForegroundColor = $fc
@@ -43,14 +59,14 @@ function Show-Error($Msg)
 function Show-Warning($Msg)
 {
     $timeStamp = Get-TimeStampUtc
-    $errorMsg = "$timeStamp : WARN  - $Msg"
-    # save the current color
+    $stack = Get-Stack
+    $errorMsg = "$timeStamp : WARN  - $stack -  $Msg"    # save the current color
     $fc = $host.UI.RawUI.ForegroundColor
 
     # set the new color
     $host.UI.RawUI.ForegroundColor = "Yellow"
 
-    Write-Output $errorMsg
+    Write-Host $errorMsg
     
     # restore the original color
     $host.UI.RawUI.ForegroundColor = $fc
@@ -59,14 +75,15 @@ function Show-Warning($Msg)
 function Show-Info($Msg)
 {
     $timeStamp = Get-TimeStampUtc
-    $errorMsg = "$timeStamp : INFO  - $Msg"
+    $stack = Get-Stack
+    $errorMsg = "$timeStamp : INFO  - $stack -  $Msg"
     # save the current color
     $fc = $host.UI.RawUI.ForegroundColor
 
     # set the new color
     $host.UI.RawUI.ForegroundColor = "White"
 
-    Write-Output $errorMsg
+    Write-Host $errorMsg
     
     # restore the original color
     $host.UI.RawUI.ForegroundColor = $fc
@@ -85,7 +102,7 @@ function Show-Debug($Msg)
     # set the new color
     $host.UI.RawUI.ForegroundColor = "Cyan"
 
-    Write-Output $errorMsg
+    Write-Host $errorMsg
     
     # restore the original color
     $host.UI.RawUI.ForegroundColor = $fc

@@ -12,7 +12,7 @@
 RootModule = 'HDICloner.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.0.8'
+ModuleVersion = '0.0.0.9'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -57,7 +57,7 @@ Description = 'Clone and Sync two HDI Clusters configuration'
 # RequiredAssemblies = @()
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
-ScriptsToProcess = @("Get-HDIClonerClusterConfig.ps1", ".\utils\TimeDateUtils.ps1",".\utils\ConsoleUtils.ps1",".\utils\FileUtils.ps1")
+ScriptsToProcess = @("Get-HDIClonerClusterConfig.ps1", ".\utils\TimeDateUtils.ps1",".\utils\ConsoleUtils.ps1",".\utils\FileUtils.ps1",".\utils\AzureUtils.ps1")
 
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
@@ -69,7 +69,7 @@ ScriptsToProcess = @("Get-HDIClonerClusterConfig.ps1", ".\utils\TimeDateUtils.ps
 # NestedModules = @()
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-FunctionsToExport = @("Run-HDICloner", "Get-TimeStampUtcNWS", "Get-TimeStampUtc", "Show-Info", "Create-FolderIfNotExist")
+FunctionsToExport = @("Run-HDICloner")
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @()

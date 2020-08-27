@@ -14,14 +14,14 @@
 
 function Get-TimeStampUtcNWS()
 {
-    $timestamp = Get-Date -Format "yyyymmd_hhmmmss"
+    $timestamp = Get-Date -Format "yyyyMMdd_hhmmmss"
 
     return $timestamp;
 }
 
 function Get-TimeStampUtc()
 {
-    $timestamp = Get-Date -Format "yyyymmd hh:mmm:ss"
+    $timestamp = Get-Date -Format "yyyyMMdd hh:mmm:ss"
 
     return $timestamp;
 }
