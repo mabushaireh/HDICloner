@@ -16,6 +16,9 @@ This is a comamnd line tool that has the following options:
 ## Usage
 
 ## Setup
+This module is published on PowerShell Gallery (https://www.powershellgallery.com/packages/HDICloner) and can be installed using Install-Module:
+
+Install-Module -Name HDICloner
 
 ## Output Explained
 ![Artifacts/HLA.png](/Artifacts/Output.png)
