@@ -93,6 +93,10 @@ function Show-Info($Msg)
 
 function Show-Debug($Msg)
 {
+    if ($global:IsDebug -eq $false){
+        return
+    }
+
     $timeStamp = Get-TimeStampUtc
     $stack = Get-Stack
     $errorMsg = "$timeStamp : DEBUG - $stack -  $Msg"

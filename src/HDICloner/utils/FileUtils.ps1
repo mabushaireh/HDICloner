@@ -16,8 +16,7 @@
 #>
 
 
-function Create-FolderIfNotExist($folderName, $path)
-{
+function Create-FolderIfNotExist($folderName, $path) {
 
     Show-Debug "Passed value for folderName is $folderName"
     Show-Debug "Passed value for path is $path"
@@ -36,4 +35,29 @@ function Create-FolderIfNotExist($folderName, $path)
     
     $null = New-Item -Path "$path\$folderName" -ItemType Directory
     Show-Info "Folder $path\$folderName is created"
+}
+
+function Get-LastConfigurationFolder($path)
+{
+    Show-Debug "Get Last Configuration Folder on this path '$path'"
+    $MaxDate = Get-Date("1/1/1900")
+    Show-Debug "MaxDate is set to: $MaxDate"
+
+    Get-ChildItem -Path $path -Directory `
+    | ForEach-Object {
+        Show-Debug ("Try to parse Folder name: " + $_.Name + " to DateTime")
+        [datetime]::parseexact($_.Name, "yyyyMMdd_hhmmmss", $null )
+    } `
+    | ForEach-Object { 
+        Show-Debug "Evaluating if $_ is greated that $MaxDate"
+        if ($_ -gt $MaxDate) { 
+            $MaxDate = $_
+            Show-Debug "$MaxDate is set to: $_"
+        }
+    }    
+
+    $lastConfigFolderName = $MaxDate | Get-Date -Format "yyyyMMdd_hhmmmss"
+
+    Show-Info "Last Configuration Folder on this path $path\$lastConfigFolderName"
+    return "$path\$lastConfigFolderName"
 }
