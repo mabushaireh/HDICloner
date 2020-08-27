@@ -15,6 +15,7 @@
 
 
 #TODO: this is a contract only, and subject to change
+
 function Run-HDICloner {
     
     [CmdletBinding()]
@@ -31,21 +32,51 @@ function Run-HDICloner {
         [Parameter(Mandatory = $false, ParameterSetName = "Main", HelpMessage = "Source Cluster Subscription Id, if not provided will locate the cluster in the cueect azure account context")]
         [string] $SourceSubId
     )
-    $ScriptVersion = '0.0.0.7'
+
+    Show-Info "=== Script Preperation Started ==="
+
+    $ScriptVersion = '0.0.0.8'
+    Show-Debug "ScriptVersion : $ScriptVersion"
 
     $ConfirmPreference = "High"
 
 
-    $timestamp = Get-Date -Format "yyyymmd_hms"
+    $timestamp = Get-TimeStampUtcNWS
     $transcriptPath = "$env:TEMP\$timestamp\"
+    
 
-    if (-Not (Test-Path $transcriptPath)) {
-        New-Item -Path $transcriptPath -ItemType Directory
-    }
 
+    Create-FolderIfNotExist $timestamp "$env:TEMP"
+
+    $documentsPath = [Environment]::GetFolderPath("MyDocuments")
+    $outputFolder = "HDICloner"
+
+    Show-Debug "documentsPath is $documentsPath"
+    Create-FolderIfNotExist $outputFolder $documentsPath
+
+    $outputPath = "$documentsPath\$outputFolder"
+    Show-Info ("Output Path is set to $outputPath")
+
+
+
+
+    Show-Info "=== Script is Ready ==="
 
     $null = Start-Transcript -Path "$transcriptPath\Transcript.txt"
-    Write-Output "=== Script Started ==="
+    Show-Debug ("Transacript Started and transcript file is $transcriptPath\Transcript.txt")
+
+
+    Show-Debug "Passed value for Operation is $Operation"
+    Show-Debug "Passed value for SourceCluster is $SourceCluster"
+    Show-Debug "Passed value for SourceSubId is $SourceSubId"
+
+    Create-FolderIfNotExist $SourceSubId $outputPath
+    Create-FolderIfNotExist $SourceCluster "$outputPath\$SourceSubId"
+    Create-FolderIfNotExist $timestamp "$outputPath\$SourceSubId\$SourceCluster"
+
+
+
+    Show-Info "=== Run $Operation HDICloner Operation Started ==="
 
 
     #TODO: Imoprt Script:
@@ -79,28 +110,27 @@ function Run-HDICloner {
     #                                                       + <Sub ID ...9012>
     
 
-
-
     
     switch -Exact ($Operation) {
         'Get' {
             Get-HDIClonerClusterConfig -SourceCluster $SourceCluster
         }
         'Make' {
-            Write-Output 'Coming Soon'
+            Show-Info 'Coming Soon'
         }   
         'Build' {
-            Write-Output 'Coming Soon'
+            Show-Info 'Coming Soon'
         }   
         'Compare' {
-            Write-Output 'Coming Soon'
+            Show-Info 'Coming Soon'
         }   
         'Sync' {
-            'Coming Soon'
+            Show-Info 'Coming Soon'
         }   
     }
 
-    Write-Output "=== Script Ended ==="
+    Show-Info "=== Run $Operation HDICloner Operation Completed ==="
+
     $null = Stop-Transcript
 
 }
