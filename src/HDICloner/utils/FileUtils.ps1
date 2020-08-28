@@ -2,11 +2,7 @@
 .Synopsis
     Utility function to fetch cluster's hadoop configs based on the cluster type
 .DESCRIPTION
-   This function takes the cluster DNS name and type and fetches the relevant Hadoop configs,
-   For now the configs to fetch are the ones that can be modified directly in the ARM template, as below
-   clusterIdentity.xml, core-site.xml, gateway.xml, hbase-env.xml, hbase-site.xml, hdfs-site.xml
-   hive-env.xml, hive-site.xml, mapred-site, oozie-site.xml, oozie-env.xml, storm-site.xml, tez-site.xml
-   webhcat-site.xml, yarn-site.xml, spark2-defaults, etc...
+   This function takes.
    
 .EXAMPLE
     ## To be added.

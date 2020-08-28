@@ -35,7 +35,6 @@ function Show-Result($Actual){
     $fc = $host.UI.RawUI.ForegroundColor
     If ($Global:Expected -ne $Actual ) {
         $host.UI.RawUI.ForegroundColor = "Red"
-
         "FAILD:   [$Global:Module- $Global:Function] '$Global:Expected' were expected while $Actual what was the actual"    
     }
     else {
@@ -44,6 +43,5 @@ function Show-Result($Actual){
     }
 
     $host.UI.RawUI.ForegroundColor = $fc
-
     "******************Unit Test End**************************"
 }
