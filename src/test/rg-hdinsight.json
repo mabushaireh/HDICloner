@@ -1,0 +1,88 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "clusters_mas915_nonesp_wasb_707_name": {
+      "type": "String"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.HDInsight/clusters",
+      "apiVersion": "2018-06-01-preview",
+      "name": "[parameters('clusters_mas915_nonesp_wasb_707_name')]",
+      "location": "East US",
+      "tags": {
+        "ManagedBy": "Register-SelfDestructiveAzResource.ps1",
+        "RefNumber": " ",
+        "DeleteAfter": "09/24/2020 19:00:00",
+        "VersionInfo": "1.0.0.7"
+      },
+      "properties": {
+        "clusterVersion": "3.6.1000.67",
+        "osType": "Linux",
+        "clusterDefinition": {
+          "blueprint": "https://blueprints.azurehdinsight.net/spark-3.6.1000.67.2007210011.json",
+          "kind": "SPARK",
+          "componentVersion": {
+            "Spark": "2.3"
+          }
+        },
+        "computeProfile": {
+          "roles": [
+            {
+              "name": "headnode",
+              "targetInstanceCount": 2,
+              "hardwareProfile": {
+                "vmSize": "standard_d3_v2"
+              },
+              "osProfile": {
+                "linuxOperatingSystemProfile": {
+                  "username": "sshuser"
+                }
+              }
+            },
+            {
+              "name": "workernode",
+              "targetInstanceCount": 1,
+              "hardwareProfile": {
+                "vmSize": "standard_d3_v2"
+              },
+              "osProfile": {
+                "linuxOperatingSystemProfile": {
+                  "username": "sshuser"
+                }
+              }
+            },
+            {
+              "name": "zookeepernode",
+              "targetInstanceCount": 3,
+              "hardwareProfile": {
+                "vmSize": "standard_A2_v2"
+              },
+              "osProfile": {
+                "linuxOperatingSystemProfile": {
+                  "username": "sshuser"
+                }
+              }
+            }
+          ]
+        },
+        "tier": "standard",
+        "encryptionInTransitProperties": {
+          "isEncryptionInTransitEnabled": false
+        },
+        "storageProfile": {
+          "storageaccounts": [
+            {
+              "name": "maswasbsa.blob.core.windows.net",
+              "container": "spark-non-esp",
+              "isDefault": true
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

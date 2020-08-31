@@ -39,8 +39,7 @@ function Get-AzureUtilsAccount($SubscriptionId) {
     else {
         Show-Debug "Current Session has already logged to an Azure Account"
         if ($SubscriptionId) {
-            if ($context.Subscription.Id -eq $SubscriptionId)
-            {
+            if ($context.Subscription.Id -eq $SubscriptionId) {
                 Show-Info "Subscription '" + $context.Subscription.Id + "' already selected."
             }
             else {
@@ -55,4 +54,38 @@ function Get-AzureUtilsAccount($SubscriptionId) {
     }
 
     return $context
+}
+
+function Deploy-ArmResource {
+    [CmdletBinding()]
+    param 
+    (
+        [Parameter(Mandatory = $false)] [string] $SubscriptionId,
+        [Parameter(Mandatory = $true)] [string] $ResourceGroupName,
+        [Parameter(Mandatory = $true)] [string] $Arm,
+        [Parameter(Mandatory = $true)] [string] $Name
+    )
+
+    Show-Debug "Passed value for SubscriptionId is set to $SubscriptionId"
+    Show-Debug "Passed value for ResourceGroupName is set to $ResourceGroupName"
+    Show-Debug "Passed value for Arm is set to $Arm"
+
+    Show-Debug "Checking if Resource Group already exists.."
+
+    $rs = Get-AzResourceGroup -Name $ResourceGroupName
+
+
+    if (!$rs){
+        Show-Warn "Resource Group $ResourceGroupName doesnt exists. Creating it."
+
+        New-AzResourceGroup -Name $ResourceGroupName
+
+        Show-Info "Resource Group $ResourceGroupName created!"
+    }
+
+    Show-Info "Deployment $Name started!"
+    $TemplateObject = ConvertFrom-Json $TemplateFileText -AsHashtable
+    New-AzResourceGroupDeployment -Name $Name -ResourceGroupName $ResourceGroupName -Mode Incremental -TemplateParameterObject $TemplateObject
+
+
 }
