@@ -15,6 +15,9 @@
     https://github.com/mabushaireh/HDICloner
 #>
 
+
+
+#TODO: Get the last version by the user and the last version after Cluster creation, Compare two versions and show the changes only.
 function Get-AmbariConfigs($SourceCluster, $SubscriptionId){
             # Read cluster DNS name and required HDP configs from Main
             # Fetch the relevant configs
@@ -56,6 +59,8 @@ function Get-AmbariConfigs($SourceCluster, $SubscriptionId){
     Show-Info "Configs for $HDPConfig file have been retrieved"
 }
 
+
+#TODO: OPTION 1: Function to return the Service Requested for restart. OPTION 2: param RestartIfRequired: boolean, If true function should restart the required service automatically and return scuess if completed.
 function Set-AmbariConfigs {
     Write-Output "To be continued..."
 }
