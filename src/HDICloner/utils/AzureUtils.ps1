@@ -63,12 +63,19 @@ function Deploy-ArmResource {
         [Parameter(Mandatory = $false)] [string] $SubscriptionId,
         [Parameter(Mandatory = $true)] [string] $ResourceGroupName,
         [Parameter(Mandatory = $true)] [string] $Arm,
-        [Parameter(Mandatory = $true)] [string] $Name
+        [Parameter(Mandatory = $true)] [string] $Name,
+        [Parameter(Mandatory = $true)] [Hashtable] $params
     )
+
+    $temp = ConvertTo-Json $params -Depth 100
 
     Show-Debug "Passed value for SubscriptionId is set to $SubscriptionId"
     Show-Debug "Passed value for ResourceGroupName is set to $ResourceGroupName"
     Show-Debug "Passed value for Arm is set to $Arm"
+    Show-Debug "Passed value for Name is set to $Name"
+    Show-Debug "Passed value for params is set to $temp"
+    
+    
 
     Show-Debug "Checking if Resource Group already exists.."
 
@@ -76,16 +83,62 @@ function Deploy-ArmResource {
 
 
     if (!$rs){
-        Show-Warn "Resource Group $ResourceGroupName doesnt exists. Creating it."
-
-        New-AzResourceGroup -Name $ResourceGroupName
+        Show-Warning "Resource Group $ResourceGroupName doesnt exists. Creating it."
+        
+        #TODO: get Cluster Location
+        New-AzResourceGroup -Name $ResourceGroupName -Location "West Europe"
 
         Show-Info "Resource Group $ResourceGroupName created!"
     }
 
+    $TemplateObject = ConvertFrom-Json $Arm -AsHashtable
+
+    #Prepare-ArmTemplate ($TemplateObject["resources"])[0] $TemplateObject 
+
+    Show-Info "Prepare Arm template for new deployment"
+    
+    switch -Exact ((($TemplateObject["resources"])[0])["type"]) {
+        'Microsoft.HDInsight/clusters' {
+            # Chekc if params are correct
+            # Cluster Dns Name
+            # Storage Name
+            # ambari username and password
+            # ssh password
+            # Network Profile (Optional)
+
+            Show-Debug "Delete blueprint"
+            (((($TemplateObject["resources"])[0])["properties"])["clusterDefinition"]).Remove("blueprint")
+
+            Show-Debug "blueprint properties removed"
+
+            #add hduserPassword
+            $hduserPassword = @{
+                "gateway" = @{
+                    "restAuthCredential.isEnabled" = "true"
+                    "restAuthCredential.username" = $params["hduser"]
+                    "restAuthCredential.password" = $params["hdpassword"]
+                }
+            }
+            
+            (((($TemplateObject["resources"])[0])["properties"])["clusterDefinition"]).Add("configurations", $hduserPassword)
+
+            #add SshPassword
+            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][0])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $params["sshpassword"])            
+            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][1])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $params["sshpassword"])            
+            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][2])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $params["sshpassword"]) 
+
+
+            #Add storage Profile Key
+            $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0].Add("key", "[listKeys(resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Storage/storageAccounts'," + $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0]["name"] +"), '2015-05-01-preview').key1") 
+        }
+    }
+    
+    $temp = ConvertTo-Json $TemplateObject -Depth 100
+    Show-Debug "Template after preparation $temp"
+
     Show-Info "Deployment $Name started!"
-    $TemplateObject = ConvertFrom-Json $TemplateFileText -AsHashtable
-    New-AzResourceGroupDeployment -Name $Name -ResourceGroupName $ResourceGroupName -Mode Incremental -TemplateParameterObject $TemplateObject
-
-
+    New-AzResourceGroupDeployment -Name $Name -ResourceGroupName $ResourceGroupName -Mode Incremental -TemplateObject $TemplateObject
 }
+
+
+
