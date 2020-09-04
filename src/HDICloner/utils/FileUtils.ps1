@@ -59,7 +59,7 @@ function Get-LastConfigurationFolder($path)
 }
 
 
-funcation Get-PathFor {
+function Get-PathFor {
     [CmdletBinding()]
     param 
     (

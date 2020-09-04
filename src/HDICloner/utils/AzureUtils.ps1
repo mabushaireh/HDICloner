@@ -60,7 +60,6 @@ function Deploy-ArmResource {
     [CmdletBinding()]
     param 
     (
-        [Parameter(Mandatory = $false)] [string] $SubscriptionId,
         [Parameter(Mandatory = $true)] [string] $ResourceGroupName,
         [Parameter(Mandatory = $true)] [string] $Arm,
         [Parameter(Mandatory = $true)] [string] $Name,
@@ -69,7 +68,6 @@ function Deploy-ArmResource {
 
     $temp = ConvertTo-Json $params -Depth 100
 
-    Show-Debug "Passed value for SubscriptionId is set to $SubscriptionId"
     Show-Debug "Passed value for ResourceGroupName is set to $ResourceGroupName"
     Show-Debug "Passed value for Arm is set to $Arm"
     Show-Debug "Passed value for Name is set to $Name"
@@ -141,4 +139,26 @@ function Deploy-ArmResource {
 }
 
 
+function Export-AzureUtilsResource {
+    [CmdletBinding()]
+    param 
+    (
+        [Parameter(Mandatory = $true)] [string] $ResourceName,
+        [Parameter(Mandatory = $true)] [string] $Path
+    )
 
+    Show-Debug "ResourceName set to  $ResourceName"
+
+    Show-Info "Get Reosurce Resource Gruop"
+
+    $rs = Get-AzResource -Name $ResourceName
+
+    if (!$rs)
+    {
+        Show-Error "Resource $ResourceName not found!"
+        return
+    }
+
+    Show-Info "Exporting " + $rs.Name +" of type [" + $rs.ResourceType + "]"
+    Export-AzResourceGroup -ResourceGroupName $rs.ResourceGroupName -Resource $rs.ResourceId -SkipAllParameterization -IncludeComments -Path $Path -Force
+}
