@@ -57,3 +57,58 @@ function Get-LastConfigurationFolder($path)
     Show-Info "Last Configuration Folder on this path $path\$lastConfigFolderName"
     return "$path\$lastConfigFolderName"
 }
+
+
+funcation Get-PathFor {
+    [CmdletBinding()]
+    param 
+    (
+        [Parameter(Mandatory = $true)] [string] $SubscriptionId,
+        [Parameter(Mandatory = $true)] [string] $ClusterDnsName,
+        [Parameter(Mandatory = $true)] [string] 
+        [ValidateSet("Base", "ARM", "HDP-CONFIG", "HDP-ENV", "Nodes-HN", "Nodes-WN", "Nodes-ZK")]
+        $ConfigArea
+    )
+
+    $documentsPath = [Environment]::GetFolderPath("MyDocuments")
+    $productBaseFolderName = "HDICloner";
+
+    $clsuterPath = "$documentsPath\$productBaseFolderName\$SubscriptionId\$ClusterDnsName"
+
+    switch -Exact (ConfigArea) {
+        'Base' {
+            return "$documentsPath\$productBaseFolderName"
+        }
+        'ARM' {
+            $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
+
+            return "$lastConfigFolder\ARM"
+        }
+        'HDP-CONFIG' {
+            $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
+
+            return "$lastConfigFolder\HDP\CONFIG"
+        }
+        'HDP-ENV' {
+            $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
+
+            return "$lastConfigFolder\HDP\ENV"
+        }
+        'Nodes-HN' {
+            $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
+
+            return "$lastConfigFolder\Nodes\HN"
+        }
+        'Nodes-WN' {
+            $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
+
+            return "$lastConfigFolder\Nodes\WN"
+        }
+        'Nodes-ZK' {
+            $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
+
+            return "$lastConfigFolder\Nodes\ZK"
+        }
+    }
+
+}
