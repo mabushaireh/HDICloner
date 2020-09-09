@@ -72,7 +72,7 @@
         },
         "storageProfile": {
           "storageaccounts": [
-            {
+            { 
               "name": "maswasbsa.blob.core.windows.net",
               "container": "spark-non-esp",
               "isDefault": true

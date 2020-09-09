@@ -56,17 +56,18 @@ function Get-AzureUtilsAccount($SubscriptionId) {
     return $context
 }
 
-function Deploy-ArmResource {
+function Deploy-AzureUtilsResource {
     [CmdletBinding()]
     param 
     (
         [Parameter(Mandatory = $true)] [string] $ResourceGroupName,
+        [Parameter(Mandatory = $true)] [string] $ClusterDnsName,
         [Parameter(Mandatory = $true)] [string] $Arm,
-        [Parameter(Mandatory = $true)] [string] $Name,
-        [Parameter(Mandatory = $true)] [Hashtable] $params
+        [Parameter(Mandatory = $true)] [string] $DeploymentName,
+        [Parameter(Mandatory = $true)] [Hashtable] $Params
     )
 
-    $temp = ConvertTo-Json $params -Depth 100
+    $temp = ConvertTo-Json $Params -Depth 100
 
     Show-Debug "Passed value for ResourceGroupName is set to $ResourceGroupName"
     Show-Debug "Passed value for Arm is set to $Arm"
@@ -104,6 +105,8 @@ function Deploy-ArmResource {
             # ssh password
             # Network Profile (Optional)
 
+
+            ($TemplateObject["resources"])[0]["name"] = $ClusterDnsName
             Show-Debug "Delete blueprint"
             (((($TemplateObject["resources"])[0])["properties"])["clusterDefinition"]).Remove("blueprint")
 
@@ -113,21 +116,25 @@ function Deploy-ArmResource {
             $hduserPassword = @{
                 "gateway" = @{
                     "restAuthCredential.isEnabled" = "true"
-                    "restAuthCredential.username" = $params["hduser"]
-                    "restAuthCredential.password" = $params["hdpassword"]
+                    "restAuthCredential.username" = $Params["hduser"]
+                    "restAuthCredential.password" = $Params["hdpassword"]
                 }
             }
             
             (((($TemplateObject["resources"])[0])["properties"])["clusterDefinition"]).Add("configurations", $hduserPassword)
 
             #add SshPassword
-            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][0])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $params["sshpassword"])            
-            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][1])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $params["sshpassword"])            
-            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][2])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $params["sshpassword"]) 
+            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][0])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $Params["sshpassword"])            
+            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][1])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $Params["sshpassword"])            
+            (((((($TemplateObject["resources"])[0])["properties"])["computeProfile"])["roles"][2])["osProfile"])["linuxOperatingSystemProfile"].Add("password", $Params["sshpassword"]) 
 
 
             #Add storage Profile Key
-            $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0].Add("key", "[listKeys(resourceId(subscription().subscriptionId, resourceGroup().name,'Microsoft.Storage/storageAccounts'," + $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0]["name"] +"), '2015-05-01-preview').key1") 
+            $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0].Add("key", "[listKeys('" + $Params["storageResourceId"] + "', '2015-05-01-preview').key1]") 
+
+            if ($params.Contains("container")){
+                $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0]["container"] = $Params["container"]
+            }
         }
     }
     
@@ -135,7 +142,7 @@ function Deploy-ArmResource {
     Show-Debug "Template after preparation $temp"
 
     Show-Info "Deployment $Name started!"
-    New-AzResourceGroupDeployment -Name $Name -ResourceGroupName $ResourceGroupName -Mode Incremental -TemplateObject $TemplateObject
+    New-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName -Mode Incremental -TemplateObject $TemplateObject
 }
 
 

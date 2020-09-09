@@ -15,3 +15,14 @@ Sep 04, 2020 9:32:46 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notif
 INFO: Unsupported notification method: $/setTraceNotification
 Sep 04, 2020 9:32:47 AM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
 INFO: Unsupported notification method: $/setTraceNotification
+2020.09.04 10:51:38 INFO  started: Metals version 0.9.3 in workspace 'C:\Users\maabusha\source\repos\mabushaireh\HDICloner' for client vscode.
+2020.09.04 10:51:43 INFO  time: initialize in 5.65s
+2020.09.04 10:51:54 WARN  no build tool detected in workspace 'C:\Users\maabusha\source\repos\mabushaireh\HDICloner'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+Sep 04, 2020 5:14:23 PM org.eclipse.lsp4j.jsonrpc.services.GenericEndpoint notify
+INFO: Unsupported notification method: $/setTraceNotification
+2020.09.07 15:43:32 INFO  started: Metals version 0.9.3 in workspace 'C:\Users\maabusha\source\repos\mabushaireh\HDICloner' for client vscode.
+2020.09.07 15:43:34 INFO  time: initialize in 1.55s
+2020.09.07 15:43:41 WARN  no build tool detected in workspace 'C:\Users\maabusha\source\repos\mabushaireh\HDICloner'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2020.09.08 14:06:45 INFO  started: Metals version 0.9.3 in workspace 'C:\Users\maabusha\source\repos\mabushaireh\HDICloner' for client vscode.
+2020.09.08 14:06:46 INFO  time: initialize in 1.24s
+2020.09.08 14:06:52 WARN  no build tool detected in workspace 'C:\Users\maabusha\source\repos\mabushaireh\HDICloner'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
