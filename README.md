@@ -14,6 +14,12 @@ This is a comamnd line tool that has the following options:
 ![Artifacts/HLA.png](/Artifacts/HLA.png)
 
 ## Usage
+With this PowerShell module you can run several commands such as "Get,Make,Build,Compare,Sync".
+
+There are five cmdlets in the module; Build-HDIClonerCluster, Make-HDIClonerClusterConfig, Compare-HDIClonerClusterConfig, Get-HDIClonerClusterConfig and Sync-HDIClonerCluster; 
+
+## Example: Get the HDInsight cluster configuration with given name and Subscription ID
+Run-HDICloner -Operation Get -SourceCluster SourceClusterdnsName -SourceSubId SourceClusterSubscriptionID     
 
 ## Setup
 This module is published on PowerShell Gallery (https://www.powershellgallery.com/packages/HDICloner) and can be installed using Install-Module:
