@@ -61,7 +61,7 @@ function Deploy-AzureUtilsResource {
     param 
     (
         [Parameter(Mandatory = $true)] [string] $ResourceGroupName,
-        [Parameter(Mandatory = $true)] [string] $ClusterDnsName,
+        [Parameter(Mandatory = $true)] [string] $ResourceName,
         [Parameter(Mandatory = $true)] [string] $Arm,
         [Parameter(Mandatory = $true)] [string] $DeploymentName,
         [Parameter(Mandatory = $true)] [Hashtable] $Params
@@ -71,8 +71,9 @@ function Deploy-AzureUtilsResource {
 
     Show-Debug "Passed value for ResourceGroupName is set to $ResourceGroupName"
     Show-Debug "Passed value for Arm is set to $Arm"
-    Show-Debug "Passed value for Name is set to $Name"
-    Show-Debug "Passed value for params is set to $temp"
+    Show-Debug "Passed value for ResourceName is set to $ResourceName"
+    Show-Debug "Passed value for DeploymentName is set to $DeploymentName"
+    Show-Debug "Passed value for Params is set to $temp"
     
     
 
@@ -95,18 +96,18 @@ function Deploy-AzureUtilsResource {
     #Prepare-ArmTemplate ($TemplateObject["resources"])[0] $TemplateObject 
 
     Show-Info "Prepare Arm template for new deployment"
-    
+    $oldResourceName = ($TemplateObject["resources"])[0]["name"]
+
     switch -Exact ((($TemplateObject["resources"])[0])["type"]) {
         'Microsoft.HDInsight/clusters' {
             # Chekc if params are correct
-            # Cluster Dns Name
             # Storage Name
             # ambari username and password
             # ssh password
             # Network Profile (Optional)
+            ($TemplateObject["resources"])[0]["name"] = $ResourceName
 
 
-            ($TemplateObject["resources"])[0]["name"] = $ClusterDnsName
             Show-Debug "Delete blueprint"
             (((($TemplateObject["resources"])[0])["properties"])["clusterDefinition"]).Remove("blueprint")
 
@@ -131,15 +132,37 @@ function Deploy-AzureUtilsResource {
 
             #Add storage Profile Key
             $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0].Add("key", "[listKeys('" + $Params["storageResourceId"] + "', '2015-05-01-preview').key1]") 
+            $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0]["name"] = "maswasb1234.blob.core.windows.net"
 
             if ($params.Contains("container")){
                 $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0]["container"] = $Params["container"]
             }
         }
+        'Microsoft.Storage/storageAccounts' {
+            Show-Debug "Fix DependsOn Properties"
+            foreach ($rs in $TemplateObject["resources"]) {
+                if ($rs["dependsOn"]) {
+                    $index = 0
+                    foreach ($depend in $rs["dependsOn"]) {
+                        if ($depend -contains "blobServices"){
+                            $depend = "[resourceId('Microsoft.Storage/storageAccounts/blobServices', '$ResourceName', 'default')]"
+                        } else {
+                            $depend = "[resourceId('Microsoft.Storage/storageAccounts', '$ResourceName')]"
+                        }
+                        
+                        $rs["dependsOn"][$index] = $depend
+                        $index = $index + 1
+                    }
+                }
+
+                $rs["name"] = $rs["name"].replace($oldResourceName, $ResourceName)
+            }
+        }
     }
     
-    $temp = ConvertTo-Json $TemplateObject -Depth 100
-    Show-Debug "Template after preparation $temp"
+    #$temp = ConvertTo-Json $TemplateObject -Depth 100
+    #write-host "Full template: $temp"
+    #Show-Debug "Template after preparation $temp"
 
     Show-Info "Deployment $Name started!"
     New-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName -Mode Incremental -TemplateObject $TemplateObject

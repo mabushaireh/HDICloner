@@ -42,6 +42,27 @@ $Actual = Test-Path -Path $path
 
 Show-Result $Actual
 
+#======================
+
+
+
+$path = "C:\Users\maabusha\OneDrive - Microsoft\Documents\HDICloner\e29e0537-1c5f-4c7e-9e96-c63a5ddfcc9d\123\20200827_122957\ARM\maswasbsa.json"
+$Arm = Get-Content $path -Raw
+$params = @{
+}
+$storageName = "maswasb1234"
+
+
+$Expected = $true
+
+
+IntiUnitTest "AzureUtils.ps1" "Deploy-AzureUtilsResource" "Test Deploying Storage account $storageName " $Expected
+
+Deploy-AzureUtilsResource -ResourceGroupName "MyResourceGroup" -Arm $Arm -ResourceName $storageName -Params $params -DeploymentName "TestDeploymentHDI"
+
+$Actual = (Get-AzResource -Name $storageName) -ne $null
+
+Show-Result $Actual
 
 #======================
 
@@ -54,7 +75,7 @@ $params = @{
     hdpassword = "P@ssw0rd1234567"
     sshpassword = "P@ssw0rd1234567"
     container = "testcontainer"
-    storageResourceId = "/subscriptions/e29e0537-1c5f-4c7e-9e96-c63a5ddfcc9d/resourceGroups/rg-hdinsight/providers/Microsoft.Storage/storageAccounts/maswasbsa"
+    storageResourceId = "/subscriptions/e29e0537-1c5f-4c7e-9e96-c63a5ddfcc9d/resourceGroups/MyResourceGroup/providers/Microsoft.Storage/storageAccounts/maswasb1234"
 }
 $clusterDnsName = "mas-wasb-1234"
 
@@ -64,8 +85,11 @@ $Expected = $true
 
 IntiUnitTest "AzureUtils.ps1" "Deploy-AzureUtilsResource" "Test Deploying HDI $clusterDnsName " $Expected
 
-Deploy-AzureUtilsResource -ResourceGroupName "MyResourceGroup" -Arm $Arm -ClusterDnsName $clusterDnsName -Params $params -DeploymentName "TestDeploymentHDI"
+Deploy-AzureUtilsResource -ResourceGroupName "MyResourceGroup" -Arm $Arm -ResourceName $clusterDnsName -Params $params -DeploymentName "TestDeploymentHDI"
 
-$Actual = !(Get-AzHDInsightCluster -ClusterName $clusterDnsName)
+$Actual = (Get-AzHDInsightCluster -ClusterName $ResourceName) -ne $null
 
 Show-Result $Actual
+
+
+
