@@ -52,15 +52,21 @@ function Get-AmbariConfigs($SourceCluster, $SubscriptionId){
     #TODO: Try to get the differences in the files.
     # Find a Way to use $credential param containing user/password to avoid extra prompt for password.
 
-    $HTTPSUri = "https://$SourceCluster.azurehdinsight.net/api/v1/clusters/testspark/configurations?tag=INITIAL&type="
+    $HTTPSUri = "https://testspark.azurehdinsight.net/api/v1/clusters/testspark/configurations/service_config_versions?is_current=true"
 
-    $HDPConfigJSON =  (Invoke-WebRequest -Uri $HTTPSUri+$HDPConfig -Credential $Credentials -UseBasicParsing).Content
-        
-    Show-Info "Configs for $HDPConfig file have been retrieved"
+    $HDPConfigLatestVersion = (Invoke-WebRequest -Uri $HTTPSUri  -Credential $Credentials -UseBasicParsing).Content
+    $HDPConfigInitialVersion = (Invoke-WebRequest -Uri $HTTPSUri+"&service_config_version=1" -Credential $Credentials -UseBasicParsing).Content
+
+    $delta = # Need to use PS function to compare two JSON objects key by key, and value by value. instead of comparing the JSON as a complete string.
+
+    Show-Info "Configs for $HDPConfigVersions file have been retrieved"
+
+    #Loop over items, get array of JSON for current -> get another array of JSON for version 1 -> compare both, and fetch the newest.
 }
 
 
-#TODO: OPTION 1: Function to return the Service Requested for restart. OPTION 2: param RestartIfRequired: boolean, If true function should restart the required service automatically and return scuess if completed.
+#TODO: OPTION 1: Function to return the Service Requested for restart. 
+#      OPTION 2: param RestartIfRequired: boolean, If true function should restart the required service automatically and return scuess if completed.
 function Set-AmbariConfigs {
     Write-Output "To be continued..."
 }
@@ -70,4 +76,4 @@ function Set-AmbariConfigs {
     #"configurations": {
         #"hive-site": $HiveSiteConfig
         #"spark2-defaults": $Spark2Defaults
-    #}
+    #}/
