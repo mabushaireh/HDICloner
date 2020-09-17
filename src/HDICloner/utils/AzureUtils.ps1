@@ -131,12 +131,17 @@ function Deploy-AzureUtilsResource {
 
 
             #Add storage Profile Key
-            $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0].Add("key", "[listKeys('" + $Params["storageResourceId"] + "', '2015-05-01-preview').key1]") 
-            $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0]["name"] = "maswasb1234.blob.core.windows.net"
+            $storageName =  $Params["Storage"].substring(0, $dependicies.Storage.IndexOf(".")+2)
+            Show-Debug "storageName is $storageName"
 
-            if ($params.Contains("container")){
-                $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0]["container"] = $Params["container"]
-            }
+            $rsStroage = Get-AzResource -Name $storageName
+
+            Show-Debug "rsStroage is $rsStroage"
+            $resourceId = $rsStroage.ResourceId
+
+            Show-Debug "resourceId is $resourceId"
+            $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0].Add("key", "[listKeys('" + $resourceId  + "', '2015-05-01-preview').key1]") 
+            $TemplateObject["resources"][0]["properties"]["storageProfile"]["storageaccounts"][0]["name"] =  $Params["Storage"]
         }
         'Microsoft.Storage/storageAccounts' {
             Show-Debug "Fix DependsOn Properties"
@@ -160,9 +165,9 @@ function Deploy-AzureUtilsResource {
         }
     }
     
-    #$temp = ConvertTo-Json $TemplateObject -Depth 100
-    #write-host "Full template: $temp"
-    #Show-Debug "Template after preparation $temp"
+    $temp = ConvertTo-Json $TemplateObject -Depth 100
+    
+    Show-Debug "Template after preparation $temp"
 
     Show-Info "Deployment $Name started!"
     New-AzResourceGroupDeployment -Name $DeploymentName -ResourceGroupName $ResourceGroupName -Mode Incremental -TemplateObject $TemplateObject
@@ -190,5 +195,32 @@ function Export-AzureUtilsResource {
     }
 
     Show-Info "Exporting " + $rs.Name +" of type [" + $rs.ResourceType + "]"
-    Export-AzResourceGroup -ResourceGroupName $rs.ResourceGroupName -Resource $rs.ResourceId -SkipAllParameterization -IncludeComments -Path $Path -Force
+    Export-AzResourceGroup -ResourceGroupName $rs.ResourceGroupName -Resource $rs.ResourceId -SkipAllParameterization -IncludeComments -Path "$Path\$ResourceName.json" -Force
+}
+
+
+function Ger-AzureUtilsHdiDependencies {
+    [CmdletBinding()]
+    param 
+    (
+        [Parameter(Mandatory = $true)] [string] $ClusterDnsName
+    )
+
+    Show-Debug "ClusterDnsName set to  $ClusterDnsName"
+
+    $cluster = Get-AzHDInsightCluster -ClusterName $ClusterDnsName
+
+    if (!$cluster) {
+        Show-Error "Cluster not found!"
+        return
+    }
+
+    $dependicies = @{
+        ResourceGroup = $cluster.ResourceGroup
+        Storage = $cluster.DefaultStorageAccount
+        VNet = $cluster.VirtualNetworkId
+        Subnet = $cluster.SubnetName
+    }
+
+    return $dependicies 
 }

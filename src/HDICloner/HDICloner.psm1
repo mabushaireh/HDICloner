@@ -30,12 +30,22 @@ function Run-HDICloner {
         [string] $SourceCluster,
 
         [Parameter(Mandatory = $false, ParameterSetName = "Main", HelpMessage = "Source Cluster Subscription Id, if not provided will locate the cluster in the cueect azure account context")]
-        [string] $SourceSubId
+        [string] $SourceSubId,
+
+        [Parameter(Mandatory = $true, ParameterSetName = "Main", HelpMessage = "Ambari Username")]
+        [string]
+        $Username,
+
+        [Parameter(Mandatory = $true, ParameterSetName = "Main", HelpMessage = "Ambari Password")]
+        [string]
+        $Password
     )
+
+  
 
     Show-Info "=== Script Preperation Started ==="
 
-    $ScriptVersion = '0.0.0.9'
+    $ScriptVersion = '0.0.0.10'
     Show-Debug "ScriptVersion : $ScriptVersion"
 
     $ConfirmPreference = "High"
@@ -84,6 +94,7 @@ function Run-HDICloner {
     Create-FolderIfNotExist "HDP" "$outputPath\$SourceSubId\$SourceCluster\$timestamp"
     Create-FolderIfNotExist "CONFIG" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\HDP"
     Create-FolderIfNotExist "ENV" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\HDP"
+    Create-FolderIfNotExist "Log4j" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\HDP"
     Create-FolderIfNotExist "Nodes" "$outputPath\$SourceSubId\$SourceCluster\$timestamp"
     Create-FolderIfNotExist "HN" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\Nodes"
     Create-FolderIfNotExist "WN" "$outputPath\$SourceSubId\$SourceCluster\$timestamp\Nodes"
@@ -99,7 +110,7 @@ function Run-HDICloner {
     
     switch -Exact ($Operation) {
         'Get' {
-            Get-HDIClonerClusterConfig -SourceCluster $SourceCluster
+            Get-HDIClonerClusterConfig -SourceCluster $SourceCluster -Username $Username -Password $Password
         }
         'Make' {
             Show-Info 'Coming Soon'

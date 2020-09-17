@@ -18,31 +18,28 @@
 
 
 #TODO: Get the last version by the user and the last version after Cluster creation, Compare two versions and show the changes only.
-function Get-AmbariConfigs($SourceCluster, $SubscriptionId){
+function Get-AmbariUtilsConfig {
             # Read cluster DNS name and required HDP configs from Main
             # Fetch the relevant configs
-           
-    
     [CmdletBinding()]
     param 
-    (    
-        [Parameter(Mandatory = $true, ParameterSetName = "AmbariUtils", HelpMessage = "Ambari Username")]
+    (  
+        [Parameter(Mandatory = $true, ParameterSetName = "Main", HelpMessage = "Cluster Dns Name")]
+        [string]
+        $ClustDnsName,  
+        [Parameter(Mandatory = $true, ParameterSetName = "Main", HelpMessage = "Ambari Username")]
         [string]
         $Username,
 
-        [Parameter(Mandatory = $true, ParameterSetName = "AmbariUtils", HelpMessage = "Ambari Password")]
+        [Parameter(Mandatory = $true, ParameterSetName = "Main", HelpMessage = "Ambari Password")]
         [string]
-        $Password,
- 
-        [Parameter(ValueFromPipelineByPropertyName = $true, HelpMessage = "HDP Config file name; hive-env.xml, etc...")]
-        [ValidateSet("core-site", "hive-site", "hive-env", "hdfs-site", "hbase-site", "hbase-env",
-                    "mapred-site", "oozie-site", "oozie-env", "storm-site", "tez-site"
-                    "webhcat-site", "yarn-site", "spark2-defaults")]
-        [string]
-        $HDPConfig
+        $Password
     )
+    Show-Debug "Value set for ClustDnsName is $ClustDnsName"
+    Show-Debug "Value set for Username is $Username"
+    Show-Debug "Value set for Password is $Password"
 
-    Show-Info "Attempting to fetch relevant configs for cluster name $SourceCluster"
+    Show-Info "Attempting to fetch relevant configs for cluster name $ClustDnsName"
 
     #Use the below to avoid manual prompt for password when calling Ambari API.
     $SecPasswd = ConvertTo-SecureString $Password -AsPlainText -Force
@@ -52,16 +49,26 @@ function Get-AmbariConfigs($SourceCluster, $SubscriptionId){
     #TODO: Try to get the differences in the files.
     # Find a Way to use $credential param containing user/password to avoid extra prompt for password.
 
-    $HTTPSUri = "https://testspark.azurehdinsight.net/api/v1/clusters/testspark/configurations/service_config_versions?is_current=true"
+    $HTTPSUri = "https://$ClustDnsName.azurehdinsight.net/api/v1/clusters/$ClustDnsName/configurations"
 
-    $HDPConfigLatestVersion = (Invoke-WebRequest -Uri $HTTPSUri  -Credential $Credentials -UseBasicParsing).Content
-    $HDPConfigInitialVersion = (Invoke-WebRequest -Uri $HTTPSUri+"&service_config_version=1" -Credential $Credentials -UseBasicParsing).Content
+    $HDPConfigVersions = (Invoke-WebRequest -Uri $HTTPSUri  -Credential $Credentials -UseBasicParsing).Content
+    Show-Debug $HDPConfigVersions
+    $versions = ConvertFrom-Json $HDPConfigVersions -AsHashtable
 
-    $delta = # Need to use PS function to compare two JSON objects key by key, and value by value. instead of comparing the JSON as a complete string.
+    $lastVersion = ($versions["items"][$versions["items"].Count-1]).tag
 
-    Show-Info "Configs for $HDPConfigVersions file have been retrieved"
+    $configs = @{}
+    foreach ($version in $versions["items"]){
+        
+        if ($version.tag -eq $lastVersion){
+            Show-Debug ("Get Configuration type [" + $version.type + "] for latest version [" + $version.tag + "]")
+            $HTTPSUri = "https://$ClustDnsName.azurehdinsight.net/api/v1/clusters/$ClustDnsName/configurations?tag=$lastVersion&type=" + $version.type
+            $result = (Invoke-WebRequest -Uri $HTTPSUri  -Credential $Credentials -UseBasicParsing).Content
+            $configs.Add($version.type, $result)
+        }
+    }
+    return $configs
 
-    #Loop over items, get array of JSON for current -> get another array of JSON for version 1 -> compare both, and fetch the newest.
 }
 
 

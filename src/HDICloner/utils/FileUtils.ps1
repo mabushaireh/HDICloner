@@ -66,7 +66,7 @@ function Get-PathFor {
         [Parameter(Mandatory = $true)] [string] $SubscriptionId,
         [Parameter(Mandatory = $true)] [string] $ClusterDnsName,
         [Parameter(Mandatory = $true)] [string] 
-        [ValidateSet("Base", "ARM", "HDP-CONFIG", "HDP-ENV", "Nodes-HN", "Nodes-WN", "Nodes-ZK")]
+        [ValidateSet("Base", "ARM", "HDP", "HDP-CONFIG", "HDP-ENV", "HDP-Log4j", "Nodes-HN", "Nodes-WN", "Nodes-ZK")]
         $ConfigArea
     )
 
@@ -75,7 +75,7 @@ function Get-PathFor {
 
     $clsuterPath = "$documentsPath\$productBaseFolderName\$SubscriptionId\$ClusterDnsName"
 
-    switch -Exact (ConfigArea) {
+    switch -Exact ($ConfigArea) {
         'Base' {
             return "$documentsPath\$productBaseFolderName"
         }
@@ -83,6 +83,11 @@ function Get-PathFor {
             $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
 
             return "$lastConfigFolder\ARM"
+        }
+        'HDP' {
+            $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
+
+            return "$lastConfigFolder\HDP"
         }
         'HDP-CONFIG' {
             $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
@@ -93,6 +98,11 @@ function Get-PathFor {
             $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
 
             return "$lastConfigFolder\HDP\ENV"
+        }
+        'HDP-Log4j' {
+            $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath
+
+            return "$lastConfigFolder\HDP\Log4j"
         }
         'Nodes-HN' {
             $lastConfigFolder = Get-LastConfigurationFolder $clsuterPath

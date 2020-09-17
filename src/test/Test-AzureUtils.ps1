@@ -1,5 +1,6 @@
 #Initialize
 . ".\TestUtils.ps1"
+. "..\HDICloner\utils\StringUtils.ps1"
 . "..\HDICloner\utils\ConsoleUtils.ps1"
 . "..\HDICloner\utils\TimeDateUtils.ps1"
 . "..\HDICloner\utils\FileUtils.ps1"
@@ -74,8 +75,7 @@ $params = @{
     hduser = "hduser"
     hdpassword = "P@ssw0rd1234567"
     sshpassword = "P@ssw0rd1234567"
-    container = "testcontainer"
-    storageResourceId = "/subscriptions/e29e0537-1c5f-4c7e-9e96-c63a5ddfcc9d/resourceGroups/MyResourceGroup/providers/Microsoft.Storage/storageAccounts/maswasb1234"
+    Storage = "maswasb1234.blob.core.windows.net"
 }
 $clusterDnsName = "mas-wasb-1234"
 
@@ -87,9 +87,32 @@ IntiUnitTest "AzureUtils.ps1" "Deploy-AzureUtilsResource" "Test Deploying HDI $c
 
 Deploy-AzureUtilsResource -ResourceGroupName "MyResourceGroup" -Arm $Arm -ResourceName $clusterDnsName -Params $params -DeploymentName "TestDeploymentHDI"
 
-$Actual = (Get-AzHDInsightCluster -ClusterName $ResourceName) -ne $null
+$Actual = ((Get-AzHDInsightCluster -ClusterName $ResourceName) -ne $null)
 
 Show-Result $Actual
 
+
+#======================
+
+
+
+$clusterDnsName = "mas-wasb-1234"
+
+
+$Expected  = @{
+    ResourceGroup = "MyResourceGroup"
+    Storage = "maswasb12341.blob.core.windows.net"
+    VNet = $null
+    Subnet = $null
+}
+
+
+IntiUnitTest "AzureUtils.ps1" "Deploy-AzureUtilsResource" "Getting HDI dependicies $clusterDnsName " $Expected
+
+$Actual = Ger-AzureUtilsHdiDependencies -ClusterDnsName $clusterDnsName
+
+
+
+Show-Result $Actual
 
 

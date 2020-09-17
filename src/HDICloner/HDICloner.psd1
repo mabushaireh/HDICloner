@@ -12,7 +12,7 @@
 RootModule = 'HDICloner.psm1'
 
 # Version number of this module.
-ModuleVersion = '0.0.0.9'
+ModuleVersion = '0.0.0.10'
 
 # Supported PSEditions
 # CompatiblePSEditions = @()
@@ -57,7 +57,7 @@ Description = 'Clone and Sync two HDI Clusters configuration'
 # RequiredAssemblies = @()
 
 # Script files (.ps1) that are run in the caller's environment prior to importing this module.
-ScriptsToProcess = @("Get-HDIClonerClusterConfig.ps1", ".\utils\TimeDateUtils.ps1",".\utils\ConsoleUtils.ps1",".\utils\FileUtils.ps1",".\utils\AzureUtils.ps1")
+ScriptsToProcess = @("Get-HDIClonerClusterConfig.ps1", ".\utils\TimeDateUtils.ps1",".\utils\ConsoleUtils.ps1",".\utils\FileUtils.ps1",".\utils\AzureUtils.ps1",".\utils\AmbariUtils.ps1",".\utils\HdiUtils.ps1",".\utils\StringUtils.ps1")
 
 # Type files (.ps1xml) to be loaded when importing this module
 # TypesToProcess = @()
