@@ -45,7 +45,7 @@ function Run-HDICloner {
 
     Show-Info "=== Script Preperation Started ==="
 
-    $ScriptVersion = '0.0.0.10'
+    $ScriptVersion = '0.0.0.11'
     Show-Debug "ScriptVersion : $ScriptVersion"
 
     $ConfirmPreference = "High"
