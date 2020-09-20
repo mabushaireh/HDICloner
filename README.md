@@ -18,7 +18,8 @@ With this PowerShell module you can run several commands such as "Get,Make,Build
 
 There are five cmdlets in the module; Build-HDIClonerCluster, Make-HDIClonerClusterConfig, Compare-HDIClonerClusterConfig, Get-HDIClonerClusterConfig and Sync-HDIClonerCluster; 
 
-## Example: Get the HDInsight cluster configuration with given name and Subscription ID
+Example: Get the HDInsight cluster configuration with given name and Subscription ID:
+
 Run-HDICloner -Operation Get -SourceCluster SourceClusterdnsName -SourceSubId SourceClusterSubscriptionID     
 
 ## Setup
