@@ -15,9 +15,9 @@ The high level architecture is depicted in the image below. The tool gets all th
 
 It also copies the files that were edited posteriorly to the cluster creation such as environment variables scripts and any hdinsight-specific configuration files.
 
-The destination cluster can then be deployed with the exact same configuration.  
+The destination cluster can then be deployed with the exact same configuration as the source cluster. Alternatively, the tool can be used to generate a make file for a posterior cluster creation. 
 
-The tool can also be used to compare and/or sync two clusters configuration.
+The HDICloner can also be used to compare and/or sync two clusters configuration.
 
 ![Artifacts/HLA.png](/Artifacts/HLA.png)
 
@@ -43,11 +43,13 @@ Run-HDICloner -Operation Get -SourceCluster SourceClusterdnsName -SourceSubId So
 
 ## Output Explained
 
-The output folder arquitecture is displayed in the image below. Each time the module is run a new directory with the current timestamp is created under a directory tree structure containing the subscription ID and cluster DNS name. The ARM folder contains the template for all resources that are part of the cluster creation template inclusing the storage, vnet, Ambari and hive database information and any custom action scrips. 
+The output folder arquitecture is displayed in the image below. Each time the module is run, a new directory with the current timestamp is created under a directory tree structure containing the subscription ID and cluster DNS name. 
+
+The ARM folder contains the json files for all resources that are part of the cluster ARM template including the storage, vnet, Ambari and hive database information and any custom action scrips. 
 
 The HDP folder contains the environment and custom configuration files. 
 
-The Nodes folder stores information about the headnodes, worker nodes and zookeeper nodes that are part of the HDInsight cluster.
+The Nodes folder stores information about all the headnodes, worker nodes and zookeeper nodes that are part of the HDInsight cluster.
 
 
 ![Artifacts/HLA.png](/Artifacts/Output.png)
